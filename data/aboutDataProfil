@@ -1,7 +1,0 @@
-the data_report.html.zip is the zipped html raw data profiling via ydata-profiling ()aka pandas profiling).
-suggest Features engiennering for alert tab
-*  unsuported columns   has constant value ""
-* has a high cardinality 
-* has highly imbalanced 
-* has higly missing
-....
