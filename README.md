@@ -6,7 +6,7 @@ Le but final de ce projet est d'aider les médecins à diagnostiquer et traiter 
 
 # Participants
 - Hakim SAGHIR - Data scientist
-- Dr Mohanad MAHFOUD - Cardiologie
+- Dr Mohanad MAHFOUD - Cardiologue
 - Dr Nicolas CHAUSSON - Neurologue 
 - Maximillien Thibault ELLONG - Développeur
 - Djebar HAMMOUCHE - Mathématicien
