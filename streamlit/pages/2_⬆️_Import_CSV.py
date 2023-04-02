@@ -32,16 +32,21 @@ def data_preprocessing(csv_file):
 
     # Select relevant columns
     ml_dataset = prepared_dataset[
-        [
-            'AGE', 'BIO_CPK',
-            'BIO_CRP', 'BIO_LDL', 'BIO_NTPROBNP', 'BIO_POTASSIUM', 'BIO_HBA1C', 'BIO_TROPONINE', 'BIO_TSH3G',
-            'CDS_EE_AUTRE', 'CDS_EE_AUTRE_TEXT', 'CDS_EE_ETO', 'CDS_EE_ETT', 'CDS_EE_HECGTYPE', 'ECG_A_L_ARRIVEE',
-            'ECPL_BIO_NTPROBNP', 'ECPL_ETT', 'ECPL_HOLTER', 'ECPL_SCOP',
-            'ETIO_CE_FA', 'CDS_EE_HECG', 'ETIO_TOAST', 'FA_SUR_ECGSCOPEHOLTERREVEAL', 'ICI_ASPECT', 'ICI_IRM_NONLAC_D_ACM',
-            'ICI_SWAN_THROMBUS', 'NIHSS_INITIAL', 'ICI_IRM_LAC', 'SEXE', 'UNITE_ALCOOL/SEM'
-        ]
+        ['AGE', 'ATCD_CONSO_ALCOOL', 'ATCD_DIABETE', 'ATCD_HTA', 'BIO_CPK',
+       'BIO_CRP', 'BIO_POTASSIUM', 'ECPL_BIO_HBA1C', 'BIO_TROPONINE',
+       'BIO_TSH3G', 'ECPL_BIO_NTPROBNP', 'ETIO_TOAST', 'ICI_ASPECT',
+       'ICI_SWAN_THROMBUS', 'NIHSS_INITIAL', 'ICI_IRM_LAC', 'SEXE',
+       'UNITE_ALCOOL/SEM', 'HISTO_DEFICIT_MOTEUR', 'HISTO_APHASIE',
+       'ICI_FLAIR_SEQAVC', 'THROMBOLYSE_IV', 'THROMBECTOMIE_MECANIQUE',
+       'ECPL_BIO_LDL', 'INTUITION_MEDICALE_FA', 'ICI_IRM_NONLAC_D_ACM',
+       'ICI_IRM_NONLAC_D_ACA', 'ICI_IRM_NONLAC_D_ACP', 'ICI_IRM_NONLAC_D_ACHA',
+       'ICI_IRM_NONLAC_D_IPP', 'ICI_IRM_NONLAC_D_LB', 'ICI_IRM_NONLAC_D_AITC',
+       'ICI_IRM_NONLAC_D_ACPI', 'ICI_IRM_NONLAC_D_ACAI',
+       'ICI_IRM_NONLAC_D_ACS', 'ICI_IRM_NONLAC_G_ACM', 'ICI_IRM_NONLAC_G_ACA',
+       'ICI_IRM_NONLAC_G_ACP', 'ICI_IRM_NONLAC_G_ACHA', 'ICI_IRM_NONLAC_G_IPP',
+       'ICI_IRM_NONLAC_G_LB', 'ICI_IRM_NONLAC_G_AITC', 'ICI_IRM_NONLAC_G_ACPI',
+       'ICI_IRM_NONLAC_G_ACAI', 'ICI_IRM_NONLAC_G_ACS', 'OG_ETAT']
     ]
-    st.markdown(len(ml_dataset))
 
     return ml_dataset
 
@@ -50,8 +55,7 @@ def check_data(csv_file):
     try:
         df = pd.read_csv(csv_file)  # Import the csv file
 
-        if df.shape[1] != 18:
-            st.write(df.shape)
+        if df.shape[1] != 46:
             st.error("The number of columns is not correct")
             return False
     except pd.errors.EmptyDataError:
@@ -104,39 +108,52 @@ if uploaded_file is not None and check_data(uploaded_file):
             def load_data():
                 patient_data = {
                     "AGE": ml_dataset['AGE'],
-                    "SEXE": ml_dataset['SEXE'],
-                    "ATCD_HTA": ml_dataset['ATCD_HTA'],
-                    "UNITE_ALCOOL/SEM": ml_dataset['UNITE_ALCOOL/SEM'],
                     "ATCD_CONSO_ALCOOL": ml_dataset['ATCD_CONSO_ALCOOL'],
-                    "ATCD_FA_CONNU": ml_dataset['ATCD_FA_CONNU'],
-                    "NIHSS_INITIAL": ml_dataset['NIHSS_INITIAL'],
-                    "ICI_IRM_LAC": ml_dataset['ICI_IRM_LAC'],
-                    "ICI_IRM_NONLAC_D_ACM": ml_dataset['ICI_IRM_NONLAC_D_ACM'],
+                    "ATCD_DIABETE": ml_dataset['ATCD_DIABETE'],
+                    "ATCD_HTA": ml_dataset['ATCD_HTA'],
+                    "BIO_CPK": ml_dataset['BIO_CPK'],
+                    "BIO_CRP": ml_dataset['BIO_CRP'],
+                    "BIO_POTASSIUM": ml_dataset['BIO_POTASSIUM'],
+                    "ECPL_BIO_HBA1C": ml_dataset['ECPL_BIO_HBA1C'],
+                    "BIO_TROPONINE": ml_dataset['BIO_TROPONINE'],
+                    "BIO_TSH3G": ml_dataset['BIO_TSH3G'],
+                    "ECPL_BIO_NTPROBNP": ml_dataset['ECPL_BIO_NTPROBNP'],
+                    "ETIO_TOAST": ml_dataset['ETIO_TOAST'],
                     "ICI_ASPECT": ml_dataset['ICI_ASPECT'],
                     "ICI_SWAN_THROMBUS": ml_dataset['ICI_SWAN_THROMBUS'],
-                    "ECG_A_L_ARRIVEE": ml_dataset['ECG_A_L_ARRIVEE'],
-                    "ECPL_ETT": ml_dataset['ECPL_ETT'],
-                    "ECPL_BIO_NTPROBNP": ml_dataset['ECPL_BIO_NTPROBNP'],
-                    "BIO_NTPROBNP": ml_dataset['BIO_NTPROBNP'],
-                    "ETIO_TOAST": ml_dataset['ETIO_TOAST'],
-                    "BIO_POTASSIUM": ml_dataset['BIO_POTASSIUM'],
-                    "BIO_HBA1C": ml_dataset['BIO_HBA1C'],
-                    "BIO_LDL": ml_dataset['BIO_LDL'],
-                    "BIO_CPK": ml_dataset['BIO_CPK'],
-                    "BIO_TROPONINE": ml_dataset['BIO_TROPONINE'],
-                    "BIO_CRP": ml_dataset['BIO_CRP'],
-                    "BIO_TSH3G": ml_dataset['BIO_TSH3G'],
-                    "ATCD_DIABETE": ml_dataset['ATCD_DIABETE'],
-                    "ECPL_HOLTER": ml_dataset['ECPL_HOLTER'],
-                    "ECPL_SCOP": ml_dataset['ECPL_SCOP'],
-                    "ETIO_CE_FA": ml_dataset['ETIO_CE_FA'],
-                    "CDS_EE_HECG": ml_dataset['CDS_EE_HECG'],
-                    "CDS_EE_HECGTYPE": ml_dataset['CDS_EE_HECGTYPE'],
-                    "FA_SUR_ECGSCOPEHOLTERREVEAL": ml_dataset['FA_SUR_ECGSCOPEHOLTERREVEAL'],
-                    "CDS_EE_AUTRE_TEXT": ml_dataset['CDS_EE_AUTRE_TEXT'],
-                    "CDS_EE_AUTRE": ml_dataset['CDS_EE_AUTRE'],
-                    "CDS_EE_ETO": ml_dataset['CDS_EE_ETO'],
-                    "CDS_EE_ETT": ml_dataset['CDS_EE_ETT'],
+                    "NIHSS_INITIAL": ml_dataset['NIHSS_INITIAL'],
+                    "ICI_IRM_LAC": ml_dataset['ICI_IRM_LAC'],
+                    "SEXE": ml_dataset['SEXE'],
+                    "UNITE_ALCOOL/SEM": ml_dataset['UNITE_ALCOOL/SEM'],
+                    "HISTO_DEFICIT_MOTEUR": ml_dataset['HISTO_DEFICIT_MOTEUR'],
+                    "HISTO_APHASIE": ml_dataset['HISTO_APHASIE'],
+                    "ICI_FLAIR_SEQAVC": ml_dataset['ICI_FLAIR_SEQAVC'],
+                    "THROMBOLYSE_IV": ml_dataset['THROMBOLYSE_IV'],
+                    "THROMBECTOMIE_MECANIQUE": ml_dataset['THROMBECTOMIE_MECANIQUE'],
+                    "ECPL_BIO_LDL": ml_dataset['ECPL_BIO_LDL'],
+                    "INTUITION_MEDICALE_FA": ml_dataset['INTUITION_MEDICALE_FA'],
+                    "ICI_IRM_NONLAC_D_ACM": ml_dataset['ICI_IRM_NONLAC_D_ACM'],
+                    "ICI_IRM_NONLAC_D_ACA": ml_dataset['ICI_IRM_NONLAC_D_ACA'],
+                    "ICI_IRM_NONLAC_D_ACP": ml_dataset['ICI_IRM_NONLAC_D_ACP'],
+                    "ICI_IRM_NONLAC_D_ACHA": ml_dataset['ICI_IRM_NONLAC_D_ACHA'],
+                    "ICI_IRM_NONLAC_D_IPP": ml_dataset['ICI_IRM_NONLAC_D_IPP'],
+                    "ICI_IRM_NONLAC_D_LB": ml_dataset['ICI_IRM_NONLAC_D_LB'],
+                    "ICI_IRM_NONLAC_D_AITC": ml_dataset['ICI_IRM_NONLAC_D_AITC'],
+                    "ICI_IRM_NONLAC_D_ACPI": ml_dataset['ICI_IRM_NONLAC_D_ACPI'],
+                    "ICI_IRM_NONLAC_D_ACAI": ml_dataset['ICI_IRM_NONLAC_D_ACAI'],
+                    "ICI_IRM_NONLAC_D_ACS": ml_dataset['ICI_IRM_NONLAC_D_ACS'],
+                    "ICI_IRM_NONLAC_G_ACM": ml_dataset['ICI_IRM_NONLAC_G_ACM'],
+                    "ICI_IRM_NONLAC_G_ACA": ml_dataset['ICI_IRM_NONLAC_G_ACA'],
+                    "ICI_IRM_NONLAC_G_ACP": ml_dataset['ICI_IRM_NONLAC_G_ACP'],
+                    "ICI_IRM_NONLAC_G_ACHA": ml_dataset['ICI_IRM_NONLAC_G_ACHA'],
+                    "ICI_IRM_NONLAC_G_IPP": ml_dataset['ICI_IRM_NONLAC_G_IPP'],
+                    "ICI_IRM_NONLAC_G_LB": ml_dataset['ICI_IRM_NONLAC_G_LB'],
+                    "ICI_IRM_NONLAC_G_AITC": ml_dataset['ICI_IRM_NONLAC_G_AITC'],
+                    "ICI_IRM_NONLAC_G_ACPI": ml_dataset['ICI_IRM_NONLAC_G_ACPI'],
+                    "ICI_IRM_NONLAC_G_ACAI": ml_dataset['ICI_IRM_NONLAC_G_ACAI'],
+                    "ICI_IRM_NONLAC_G_ACS": ml_dataset['ICI_IRM_NONLAC_G_ACS'],
+                    "OG_ETAT": ml_dataset['OG_ETAT'],
+                    
                     }
 
                 return pd.DataFrame(patient_data, index=[0])
@@ -153,14 +170,14 @@ if uploaded_file is not None and check_data(uploaded_file):
                 my_bar.progress(percent_complete + 1, text=progress_text)
 
             # Save the new dataset
-            path = r"./data/patient_database/{}.csv".format(patient_index)
+            path = r"./streamlit/data/patient_database/{}.csv".format(patient_index)
             df_patient_data.to_csv(path, index=False)
             st.success("New dataset saved !", icon="✅")
             st.cache_data.clear()
 
             # Display results and model info in expanders
             with st.expander("Results"):
-                df = pd.read_csv("data/patient_database/{}.csv".format(patient_index))
+                df = pd.read_csv("./streamlit/data/patient_database/{}.csv".format(patient_index))
                 st.markdown("## Results")
                 st.dataframe(t_df, use_container_width=True)
 

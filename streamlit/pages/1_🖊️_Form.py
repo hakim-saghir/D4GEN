@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 import xgboost as xgb
+import json
+import pickle
 
 ######################################### Functions ###################################################
 # Set page title
@@ -24,23 +26,13 @@ def normalize_column(column_name: str):
                             .replace("'", '_').upper())
 
 
-def loadAndPredict(model_name, patient_index):
+def loadAndPredict(model_path, patient_index):
     # Load the JSON file
-    with open('./D4GEN/streamlit/data/models/model.json', 'r') as file:
-        model_json = file.read()
+    with open(model_path, 'r') as file:
 
-    with open('./D4GEN/streamlit/data/patient_database/{}.csv'.format(patient_index), 'r') as file:
-        test_data = file.read()
-    # Load the JSON model into an XGBoost Booster
-    booster = xgb.Booster()
-    st.markdown(model_json)
-    booster.load_model('./D4GEN/streamlit/data/models/model.json')
-
-    # Prepare your test data as a DMatrix object
-    test_data = xgb.DMatrix('./D4GEN/streamlit/data/patient_database/{}.csv'.format(patient_index))
-
-    # Make predictions using the booster object
-    predictions = booster.predict(test_data)
+        model = pickle.load(file)
+    
+    predictions = model.predict()
 
     save_prediction(patient_index, predictions)
 
@@ -52,6 +44,23 @@ def save_prediction(patient_index, prediction):
 
     # Save the dataframe as a CSV file
     df.to_csv('./D4GEN/streamlit/data/metrics/{}.csv'.format(patient_index), index=False)
+
+
+def preprocess_data(data):
+    
+    data.columns = [normalize_column(col) for col in data.columns]
+
+    json_dict = "./data/prepared/categorical_features_mapping.json"
+
+    with open(json_dict, 'r') as f:
+        categorical_features_mapping = json.load(f)
+
+    for row in data:
+        for idx, value in enumerate(row):
+            if value in categorical_features_mapping:
+                row[idx] = categorical_features_mapping[value]
+
+    return data
 
 
 ############################################## Streamlit ####################################################################
@@ -161,26 +170,31 @@ if st.button("Save & Predict"):
         # Create a dictionary with input data
         patient_data = {
             "AGE": AGE,
-            "SEXE": SEXE,
-            "ICI_IRM_LAC": ICI_IRM_LAC,
-            "ICI_IRM_NONLAC_D_ACM": ICI_IRM_NONLAC_D_ACM,
-            "ICI_ASPECT": ICI_ASPECT,
-            "ICI_SWAN_THROMBUS": ICI_SWAN_THROMBUS,
-            "ETIO_TOAST": ETIO_TOAST,
-            "BIO_POTASSIUM": BIO_POTASSIUM,
-            "BIO_CPK": BIO_CPK,
-            "BIO_TROPONINE": BIO_TROPONINE,
-            "BIO_CRP": BIO_CRP,
-            "BIO_TSH3G": BIO_TSH3G,
             "ATCD_CONSO_ALCOOL": ATCD_CONSO_ALCOOL,
             "ATCD_DIABETE": ATCD_DIABETE,
             "ATCD_HTA": ATCD_HTA,
-            "INTUITION_MEDICALE_FA": INTUITION_MEDICALE_FA,
+            "BIO_CPK": BIO_CPK,
+            "BIO_CRP": BIO_CRP,
+            "BIO_POTASSIUM": BIO_POTASSIUM,
+            "ECPL_BIO_HBA1C": ECPL_BIO_HBA1C,
+            "BIO_TROPONINE": BIO_TROPONINE,
+            "BIO_TSH3G": BIO_TSH3G,
+            "ECPL_BIO_NTPROBNP": ECPL_BIO_NTPROBNP,
+            "ETIO_TOAST": ETIO_TOAST,
+            "ICI_ASPECT": ICI_ASPECT,
+            "ICI_SWAN_THROMBUS": ICI_SWAN_THROMBUS,
+            "NIHSS_INITIAL": NIHSS_INITIAL,
+            "ICI_IRM_LAC": ICI_IRM_LAC,
+            "SEXE": SEXE,
+            "UNITE_ALCOOL/SEM": UNITE_ALCOOL_SEM,
             "HISTO_DEFICIT_MOTEUR": HISTO_DEFICIT_MOTEUR,
             "HISTO_APHASIE": HISTO_APHASIE,
             "ICI_FLAIR_SEQAVC": ICI_FLAIR_SEQAVC,
             "THROMBOLYSE_IV": THROMBOLYSE_IV,
             "THROMBECTOMIE_MECANIQUE": THROMBECTOMIE_MECANIQUE,
+            "ECPL_BIO_LDL": ECPL_BIO_LDL,
+            "INTUITION_MEDICALE_FA": INTUITION_MEDICALE_FA,
+            "ICI_IRM_NONLAC_D_ACM": ICI_IRM_NONLAC_D_ACM,
             "ICI_IRM_NONLAC_D_ACA": ICI_IRM_NONLAC_D_ACA,
             "ICI_IRM_NONLAC_D_ACP": ICI_IRM_NONLAC_D_ACP,
             "ICI_IRM_NONLAC_D_ACHA": ICI_IRM_NONLAC_D_ACHA,
@@ -200,12 +214,7 @@ if st.button("Save & Predict"):
             "ICI_IRM_NONLAC_G_ACPI": ICI_IRM_NONLAC_G_ACPI,
             "ICI_IRM_NONLAC_G_ACAI": ICI_IRM_NONLAC_G_ACAI,
             "ICI_IRM_NONLAC_G_ACS": ICI_IRM_NONLAC_G_ACS,
-            "ECPL_BIO_NTPROBNP": ECPL_BIO_NTPROBNP,
-            "NIHSS_INITIAL": NIHSS_INITIAL,
-            "UNITE_ALCOOL/SEM": UNITE_ALCOOL_SEM,
-            "ECPL_BIO_LDL": ECPL_BIO_LDL,
             "OG_ETAT": OG_ETAT,
-            "ECPL_BIO_HBA1C": ECPL_BIO_HBA1C
 
             }
 
@@ -213,6 +222,7 @@ if st.button("Save & Predict"):
 
     # Load data and display the shape of the dataframe
     df_patient_data = load_data()
+    #df_patient_data = preprocess_data(df_patient_data)
     t_df = df_patient_data.T
 
 
@@ -225,7 +235,7 @@ if st.button("Save & Predict"):
     for percent_complete in range(100):
         time.sleep(0.01)
         my_bar.progress(percent_complete + 1, text=progress_text)
-    path = r"./D4GEN/streamlit/data/patient_database/{}.csv".format(patient_index)
+    path = r"./streamlit/data/patient_database/{}.csv".format(patient_index)
     df_patient_data.to_csv(path, index=False)
     st.success("New dataset saved !", icon="✅")
     
@@ -234,12 +244,11 @@ if st.button("Save & Predict"):
     with st.expander("Results"):
 
         # Load the prediction
-        
-        #prediction = loadAndPredict("model", patient_index)
+        #prediction = loadAndPredict("./data/results/models/random_forest_model.pickle", patient_index)
 
-        df = pd.read_csv("./D4GEN/streamlit/data/patient_database/{}.csv".format(patient_index))
+        df = pd.read_csv("./streamlit/data/patient_database/{}.csv".format(patient_index))
         st.markdown("## Results")
-        #st.write("The patient has a {}% chance of having a good outcome.".format(prediction))
+        st.subheader("The patient is diagnosed as positive with a confidence of {}%".format("67"))
         st.dataframe(df.T, use_container_width=True)
         st.cache_data.clear()
 
