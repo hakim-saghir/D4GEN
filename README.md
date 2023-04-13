@@ -8,5 +8,6 @@ Le but final de ce projet est d'aider les médecins à diagnostiquer et traiter 
 - Hakim SAGHIR - Data scientist
 - Dr Mohanad MAHFOUD - Cardiologue
 - Dr Nicolas CHAUSSON - Neurologue 
+- Dr Yann L'Hermitte - Neurologue 
 - Thibault ELLONG - Développeur
 - Djebar HAMMOUCHE - Mathématicien
